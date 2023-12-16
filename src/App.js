@@ -1,43 +1,72 @@
 import { useState } from "react";
 
-const initialItems = [
-    { id: 1, description: "Passports", quantity: 2, packed: false },
-    { id: 2, description: "Socks", quantity: 12, packed: false },
-];
+// const initialItems = [
+//     { id: 1, description: "Passports", quantity: 2, packed: false },
+//     { id: 2, description: "Socks", quantity: 12, packed: false },
+// ];
 
 function App() {
+    const [items, setItems] = useState([]);
+
+    function handleNewItems(item) {
+        setItems((items) => [...items, item]);
+    }
+
+    function deleteItem(id) {
+        // this filter method, creates a new array an saves all the items that are not equal to the item that is selected to be deleted,
+        // and so the selected item is deleted
+        setItems((items) => items.filter((item) => item.id !== id));
+        console.log(id);
+    }
+
+    function handleToggle(id) {
+        setItems((items) =>
+            items.map((item) =>
+                item.id === id ? { ...item, packed: !item.packed } : item
+            )
+        );
+    }
     return (
         <div className="App">
             <Logo />
-            <Form />
-            <PackingList />
-            <Stats />
+            <Form onAddItems={handleNewItems} />
+            <PackingList
+                newItems={items}
+                deleteItems={deleteItem}
+                toggleStatus={handleToggle}
+            />
+            <Stats itemCount={items} />
         </div>
     );
 }
 
 export default App;
-
+//--------------------------------------------------------------------------------
 function Logo() {
     return <h1>😃 Far Away</h1>;
 }
-function Form() {
+//--------------------------------------------------------------------------------
+function Form({ onAddItems }) {
     const [description, setDescription] = useState("");
     const [quantity, setQuantity] = useState(1);
+
     function handleSubmit(e) {
         e.preventDefault();
         if (!description) return; // this line make sure that if there is no input value then it cant create a new object with a null value
 
-        const newObject = {
+        const newItem = {
             // this objects gets and displays the new item of the list , and gives it this structure
             description,
             quantity,
             packed: false,
             id: Date.now(),
         };
+
+        onAddItems(newItem);
+
         setQuantity(1); // sets the quantity field back to the original value
         setDescription(""); // sets the description field back to the original value
-        console.log(newObject);
+        console.log(newItem);
     }
 
     return (
@@ -63,39 +92,54 @@ function Form() {
         </form>
     );
 }
-function PackingList() {
+//-------------------------------------------------------------------------------------
+function PackingList({ newItems, deleteItems, toggleStatus }) {
     return (
         <div className="list">
             <ul>
-                {initialItems.map((item) => (
-                    <Item items={item} key={item.id} />
+                {newItems.map((item) => (
+                    <Item
+                        items={item}
+                        key={item.id}
+                        deleteItem={deleteItems}
+                        toggleStatus={toggleStatus}
+                    />
                 ))}
             </ul>
         </div>
     );
 }
-function Stats() {
+
+//-------------------------------------------------------------------------------------
+function Stats({ itemCount }) {
+    const amount = itemCount.length;
+    const packedItems = itemCount.filter((item) => item.packed).length;
+
     return (
         <footer className="stats">
             <em>
-                You have X items on your list, and you already packed X (X%)
+                You have {amount} items on your list, and you already packed{" "}
+                {packedItems}
             </em>
         </footer>
     );
 }
 // ---------------------------- child components -------------------
 
-function Item({ items }) {
+function Item({ items, deleteItem, toggleStatus }) {
     return (
         <li>
-            <input type="checkbox" />
+            <input
+                type="checkbox"
+                value={items.packed}
+                onChange={() => toggleStatus(items.id)}
+            />
             <span
                 style={items.packed ? { textDecoration: "line-through" } : {}}
             >
-                {items.quantity}
-                {items.description}
+                {items.quantity} {items.description}
             </span>
-            <button>❌</button>
+            <button onClick={() => deleteItem(items.id)}>❌</button>
         </li>
     );
 }
