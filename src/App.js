@@ -47,7 +47,7 @@ function App() {
 export default App;
 //--------------------------------------------------------------------------------
 function Logo() {
-    return <h1>😃 Far Away</h1>;
+    return <h1>🧳 Packing List 🛫</h1>;
 }
 //--------------------------------------------------------------------------------
 function Form({ onAddItems }) {
@@ -153,7 +153,7 @@ function Stats({ itemCount }) {
         <footer className="stats">
             <em>
                 {amount === packedItems
-                    ? "All packed! Lets GO !!! 🛫 "
+                    ? "All packed!😃 Lets GO !!! 🛫 "
                     : ` You have  -  ${amount} item${
                           amount > 1 ? "s" : ""
                       } on your list - ${packedItems} PACKED item${
