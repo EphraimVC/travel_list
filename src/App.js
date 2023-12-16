@@ -21,6 +21,14 @@ function App() {
             )
         );
     }
+
+    function clearList() {
+        const confirm = window.confirm(
+            "Are you sure you want to delete all items on your list ?"
+        );
+        if (confirm) setItems([]);
+    }
+
     return (
         <div className="App">
             <Logo />
@@ -29,6 +37,7 @@ function App() {
                 newItems={items}
                 deleteItems={deleteItem}
                 toggleStatus={handleToggle}
+                clearItems={clearList}
             />
             <Stats itemCount={items} />
         </div>
@@ -88,7 +97,7 @@ function Form({ onAddItems }) {
     );
 }
 //-------------------------------------------------------------------------------------
-function PackingList({ newItems, deleteItems, toggleStatus }) {
+function PackingList({ newItems, deleteItems, toggleStatus, clearItems }) {
     const [sortBy, setSortby] = useState("input");
     let sortedItems;
 
@@ -100,7 +109,7 @@ function PackingList({ newItems, deleteItems, toggleStatus }) {
     if (sortBy === "packed")
         sortedItems = newItems
             .slice()
-            .sort((a, b) => Number(a.packed) - Number(b.packed));
+            .sort((a, b) => Number(b.packed) - Number(a.packed));
 
     return (
         <div className="list">
@@ -125,6 +134,7 @@ function PackingList({ newItems, deleteItems, toggleStatus }) {
                     </option>
                     <option value="packed">Sort by packed items</option>
                 </select>
+                <button onClick={clearItems}>Clear List</button>
             </div>
         </div>
     );
@@ -132,14 +142,25 @@ function PackingList({ newItems, deleteItems, toggleStatus }) {
 
 //-------------------------------------------------------------------------------------
 function Stats({ itemCount }) {
+    if (!itemCount.length)
+        return (
+            <p className="stats">"Start Adding items to your packing list"</p>
+        );
     const amount = itemCount.length;
     const packedItems = itemCount.filter((item) => item.packed).length;
 
     return (
         <footer className="stats">
             <em>
-                You have {amount} items on your list, and you already packed{" "}
-                {packedItems}
+                {amount === packedItems
+                    ? "All packed! Lets GO !!! 🛫 "
+                    : ` You have  -  ${amount} item${
+                          amount > 1 ? "s" : ""
+                      } on your list - ${packedItems} PACKED item${
+                          packedItems > 1 ? "s" : ""
+                      } - ${amount - packedItems} item${
+                          amount - packedItems > 1 ? "s" : ""
+                      } LEFT to pack`}
             </em>
         </footer>
     );
